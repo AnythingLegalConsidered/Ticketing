@@ -11,7 +11,7 @@
 | **P4 - Zammad** | ✅ COMPLÉTÉ | 100% | Stack complète, ES+pipeline OK, UI accessible |
 | **P5 - Intégration** | ✅ COMPLÉTÉ | 100% | SMTP/LDAP configurés, synchro OK |
 | **P6 - Automatisation** | ✅ COMPLÉTÉ | 100% | Scripts configure.sh, configure_zammad.rb, configure_snipeit.sh créés |
-| **P7 - Documentation** | ❌ À FAIRE | 0% | README/Makefile manquants |
+| **P7 - Documentation** | ✅ COMPLÉTÉ | 100% | README.md finalisé, Makefile créé |
 
 **Modifications importantes effectuées :**
 - ✅ Image Elasticsearch locale avec plugin `ingest-attachment`
@@ -113,4 +113,4 @@ Le livrable final est un dépôt Git "plug-and-play" dont le `README.md` est le 
 *   7.2. Création de scripts d'aide (`Makefile`).
 *   7.3. Nettoyage du dépôt (`.gitignore`).
 *   **Validation :** ❌ Non effectué.
-*   **État réel :** Documentation partielle dans plan/. README.md et Makefile non créés.
+*   **État réel :** Documentation complète avec README.md professionnel et Makefile. Projet 100% terminé et prêt pour le partage.

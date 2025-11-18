@@ -104,7 +104,31 @@ graph TB
 
 ## 🛠️ Commandes Utiles
 
-### Gestion de la stack
+### Via Makefile (recommandé)
+```bash
+# Setup complet automatique
+make setup
+
+# Gestion de la stack
+make up          # Démarrer
+make down        # Arrêter
+make status      # État des services
+make logs        # Logs de tous les services
+make logs-nginx  # Logs d'un service spécifique
+
+# Configuration
+make configure   # Configuration automatique SMTP/LDAP
+
+# Maintenance
+make clean       # Nettoyage complet (⚠️ données perdues)
+make restart     # Redémarrer tous les services
+make build       # Rebuild les images
+
+# Debug
+make shell-zammad-app  # Shell dans un conteneur
+```
+
+### Via Docker Compose (manuel)
 ```bash
 # Démarrer tous les services
 docker compose up -d
@@ -122,19 +146,11 @@ docker compose restart [service-name]
 docker compose down -v
 ```
 
-### Développement
-```bash
-# Rebuild une image personnalisée
-docker compose build [service-name]
-
-# Accéder à un conteneur
-docker compose exec [service-name] bash
-```
-
 ## 📁 Structure du Projet
 
 ```
 .
+├── Makefile                   # 🆕 Commandes simplifiées pour la gestion
 ├── docker-compose.yml          # Orchestration principale
 ├── .env                        # Configuration centralisée
 ├── configure.sh                # Script d'automatisation
@@ -148,7 +164,9 @@ docker compose exec [service-name] bash
 │   ├── Dockerfile              # Image LDAP avec LDIF
 │   └── *.ldif                  # Structures d'annuaire
 ├── scripts/                    # Scripts utilitaires
-└── plan/                       # Documentation détaillée
+├── zammad/                     # Scripts de config Zammad
+└── snipe-it/                   # Scripts de config Snipe-IT
+    └── plan/                   # Documentation détaillée
 ```
 
 ## 🔧 Personnalisation
@@ -165,9 +183,8 @@ Modifiez `openldap/add-entries.ldif` et relancez le bootstrap.
 
 ## 📊 État du Projet
 
-- ✅ **P0-P5** : Infrastructure déployée et intégrée (85% complété)
-- ✅ **P6** : Automatisation (scripts créés)
-- 🔄 **P7** : Documentation (en cours)
+- ✅ **P0-P6** : Infrastructure déployée et automatisée (100% complété)
+- ✅ **P7** : Documentation et outils finalisés
 
 Voir `plan/Plan.md` pour le détail complet.
 
