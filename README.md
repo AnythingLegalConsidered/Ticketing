@@ -36,7 +36,7 @@ graph TB
     SnipeIT --> MailHog
     SnipeIT --> MariaDB[(MariaDB)]
     
-    subgraph "Réseau Docker: it_stack_net"
+    subgraph "Réseau Docker: ticketing"
         Nginx
         Zammad
         SnipeIT
