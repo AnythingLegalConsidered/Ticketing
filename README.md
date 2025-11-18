@@ -166,7 +166,7 @@ Modifiez `openldap/add-entries.ldif` et relancez le bootstrap.
 ## 📊 État du Projet
 
 - ✅ **P0-P5** : Infrastructure déployée et intégrée (85% complété)
-- 🔄 **P6** : Automatisation (scripts créés)
+- ✅ **P6** : Automatisation (scripts créés)
 - 🔄 **P7** : Documentation (en cours)
 
 Voir `plan/Plan.md` pour le détail complet.

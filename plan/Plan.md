@@ -10,7 +10,7 @@
 | **P3 - Snipe-IT** | ✅ COMPLÉTÉ | 100% | DB + App déployées, APP_KEY générée |
 | **P4 - Zammad** | ✅ COMPLÉTÉ | 100% | Stack complète, ES+pipeline OK, UI accessible |
 | **P5 - Intégration** | ✅ COMPLÉTÉ | 100% | SMTP/LDAP configurés, synchro OK |
-| **P6 - Automatisation** | ❌ À FAIRE | 0% | Scripts non créés |
+| **P6 - Automatisation** | ✅ COMPLÉTÉ | 100% | Scripts configure.sh, configure_zammad.rb, configure_snipeit.sh créés |
 | **P7 - Documentation** | ❌ À FAIRE | 0% | README/Makefile manquants |
 
 **Modifications importantes effectuées :**
