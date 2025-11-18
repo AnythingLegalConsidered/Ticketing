@@ -1,0 +1,259 @@
+services:
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: mailhog
+    hostname: mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    environment:
+      - TZ=${TZ}
+    networks:
+      - it_stack_net
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: nginx
+    hostname: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+    depends_on:
+      - mailhog
+    networks:
+      - it_stack_net
+    restart: unless-stopped
+  
+  openldap:
+    build: ./openldap
+    image: ticketing_openldap:local
+    container_name: openldap
+    hostname: openldap
+    environment:
+      - LDAP_ORGANISATION="Projet LAN"
+      - LDAP_DOMAIN=${DOMAIN}
+      - LDAP_ADMIN_PASSWORD=${LDAP_ROOT_PASSWORD}
+      - LDAP_CONFIG_PASSWORD=${LDAP_ROOT_PASSWORD}
+    volumes:
+      - ldap_data:/var/lib/ldap
+      - ldap_config:/etc/ldap/slapd.d
+      - ./openldap/test-user.ldif:/tmp/test-user.ldif:ro
+    networks:
+      - it_stack_net
+    restart: unless-stopped
+
+  ldap-bootstrap:
+    image: osixia/openldap:1.5.0
+    container_name: ldap-bootstrap
+    depends_on:
+      - openldap
+    networks:
+      - it_stack_net
+    restart: "no"
+    environment:
+      - DOMAIN=${DOMAIN}
+      - LDAP_ROOT_PASSWORD=${LDAP_ROOT_PASSWORD}
+    volumes:
+      - ./openldap/05-base-structure.ldif:/ldifs/05-base-structure.ldif:ro
+      - ./openldap/bootstrap.sh:/ldifs/bootstrap.sh:ro
+    entrypoint: ["sh","/ldifs/bootstrap.sh"]
+
+  mariadb-snipeit:
+    image: mariadb:10.6
+    container_name: mariadb-snipeit
+    hostname: mariadb-snipeit
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    volumes:
+      - mariadb_snipeit_data:/var/lib/mysql
+    networks:
+      - it_stack_net
+    restart: unless-stopped
+
+  snipe-it:
+    image: snipe/snipe-it:v6.3.3
+    container_name: snipe-it
+    hostname: snipe-it
+    depends_on:
+      - mariadb-snipeit
+    environment:
+      - TZ=${TZ}
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - MYSQL_PORT_3306_TCP_ADDR=mariadb-snipeit
+      - MYSQL_PORT_3306_TCP_PORT=3306
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - APP_URL=http://snipeit.${DOMAIN}
+      - APP_KEY=${SNIPEIT_APP_KEY}
+    volumes:
+      - snipeit_data:/var/lib/snipeit
+    networks:
+      - it_stack_net
+    restart: unless-stopped
+
+  # --- ZAMMAD STACK ---
+  zammad-init:
+    image: zammad/zammad:6.2.0-14
+    container_name: zammad-init
+    hostname: zammad-init
+    restart: "no"
+    depends_on:
+      - zammad-postgres
+      - zammad-elasticsearch
+    environment:
+      - POSTGRESQL_DB=${POSTGRES_DB}
+      - POSTGRESQL_HOST=zammad-postgres
+      - POSTGRESQL_PORT=5432
+      - POSTGRESQL_USER=${POSTGRES_USER}
+      - POSTGRESQL_PASS=${POSTGRES_PASSWORD}
+      - ELASTICSEARCH_HOST=zammad-elasticsearch
+      - ELASTICSEARCH_PORT=9200
+      - TZ=${TZ}
+      - REDIS_URL=redis://zammad-redis:6379
+    command: ["zammad-init"]
+    volumes:
+      - zammad_data:/opt/zammad/
+    networks:
+      - it_stack_net
+
+  zammad-postgres:
+    image: postgres:15
+    container_name: zammad-postgres
+    hostname: zammad-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - zammad_postgres_data:/var/lib/postgresql/data
+    networks:
+      - it_stack_net
+
+  zammad-redis:
+    image: redis:6-alpine
+    container_name: zammad-redis
+    hostname: zammad-redis
+    restart: unless-stopped
+    networks:
+      - it_stack_net
+
+
+  zammad-elasticsearch:
+    build: ./elasticsearch
+    image: ticketing_zammad_elasticsearch:local
+    container_name: zammad-elasticsearch
+    hostname: zammad-elasticsearch
+    restart: unless-stopped
+    environment:
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - discovery.type=single-node
+    volumes:
+      - zammad_es_data:/usr/share/elasticsearch/data
+    networks:
+      - it_stack_net
+  
+  zammad-app:
+    image: zammad/zammad:6.2.0-14
+    container_name: zammad-app
+    hostname: zammad-app
+    restart: unless-stopped
+    depends_on:
+      - zammad-postgres
+      - zammad-elasticsearch
+    environment:
+      - POSTGRESQL_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@zammad-postgres:5432/${POSTGRES_DB}
+      - POSTGRESQL_HOST=zammad-postgres
+      - POSTGRESQL_USER=${POSTGRES_USER}
+      - POSTGRESQL_PASS=${POSTGRES_PASSWORD}
+      - POSTGRESQL_DB=${POSTGRES_DB}
+      - ELASTICSEARCH_URL=http://zammad-elasticsearch:9200
+      - TZ=${TZ}
+      - REDIS_URL=redis://zammad-redis:6379
+    command: ["zammad-railsserver"]
+    volumes:
+      - zammad_data:/opt/zammad/
+    networks:
+      it_stack_net:
+        aliases:
+          - zammad-railsserver
+
+  zammad-scheduler:
+    image: zammad/zammad:6.2.0-14
+    container_name: zammad-scheduler
+    hostname: zammad-scheduler
+    restart: unless-stopped
+    depends_on:
+      - zammad-app
+    volumes:
+      - zammad_data:/opt/zammad/
+    command: ["zammad-scheduler"]
+    networks:
+      - it_stack_net
+    environment:
+      - REDIS_URL=redis://zammad-redis:6379
+      - POSTGRESQL_HOST=zammad-postgres
+      - POSTGRESQL_USER=${POSTGRES_USER}
+      - POSTGRESQL_PASS=${POSTGRES_PASSWORD}
+      - POSTGRESQL_DB=${POSTGRES_DB}
+
+  zammad-websocket:
+    image: zammad/zammad:6.2.0-14
+    container_name: zammad-websocket
+    hostname: zammad-websocket
+    restart: unless-stopped
+    depends_on:
+      - zammad-app
+    volumes:
+      - zammad_data:/opt/zammad/
+    command: ["zammad-websocket"]
+    networks:
+      - it_stack_net
+    environment:
+      - REDIS_URL=redis://zammad-redis:6379
+      - POSTGRESQL_HOST=zammad-postgres
+      - POSTGRESQL_USER=${POSTGRES_USER}
+      - POSTGRESQL_PASS=${POSTGRES_PASSWORD}
+      - POSTGRESQL_DB=${POSTGRES_DB}
+
+  zammad-nginx:
+    image: zammad/zammad:6.2.0-14
+    container_name: zammad-nginx
+    hostname: zammad-nginx
+    restart: unless-stopped
+    depends_on:
+      - zammad-app
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - zammad_data:/opt/zammad/
+    networks:
+      - it_stack_net
+    environment:
+      - POSTGRESQL_HOST=zammad-postgres
+      - POSTGRESQL_USER=${POSTGRES_USER}
+      - POSTGRESQL_PASS=${POSTGRES_PASSWORD}
+      - POSTGRESQL_DB=${POSTGRES_DB}
+    command: ["zammad-nginx"]
+
+networks:
+  it_stack_net:
+    driver: bridge
+
+volumes:
+  ldap_data:
+  ldap_config:
+  snipeit_data:
+  mariadb_snipeit_data:
+  zammad_data:
+  zammad_postgres_data:
+  zammad_es_data:

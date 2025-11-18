@@ -1,0 +1,23 @@
+dn: dc=projet,dc=lan
+objectClass: top
+objectClass: dcObject
+objectClass: organization
+o: Projet LAN
+dc: projet
+
+# admin user
+dn: cn=admin,dc=projet,dc=lan
+objectClass: simpleSecurityObject
+objectClass: organizationalRole
+cn: admin
+description: LDAP administrator
+userPassword: {SSHA}changeme
+
+# organizational units
+dn: ou=users,dc=projet,dc=lan
+objectClass: organizationalUnit
+ou: users
+
+dn: ou=groups,dc=projet,dc=lan
+objectClass: organizationalUnit
+ou: groups
