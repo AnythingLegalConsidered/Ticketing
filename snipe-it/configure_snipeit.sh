@@ -1,6 +1,6 @@
 #!/bin/bash
 # Script de configuration automatique de Snipe-IT
-# Ce script configure automatiquement Snipe-IT via les commandes artisan
+# Ce script configure automatiquement Snipe-IT via les commandes artisan et DB
 
 set -e
 
@@ -10,9 +10,32 @@ echo "=== Configuration automatique de Snipe-IT ==="
 echo "Attente de la disponibilité de Snipe-IT..."
 sleep 30
 
-# Configuration du serveur SMTP (MailHog)
-echo "Configuration du serveur SMTP..."
-php artisan snipeit:email:test --server=mailhog --port=1025 --security=none --from=admin@projet.lan
+# Créer un utilisateur administrateur automatiquement
+echo "Création de l'utilisateur administrateur..."
+php artisan snipeit:create-admin --first_name=Admin --last_name=User --email=admin@projet.lan --username=admin --password=admin123
+
+# Configuration SMTP via base de données (plus fiable que les commandes artisan)
+echo "Configuration du serveur SMTP via base de données..."
+php artisan tinker --execute="
+\$settings = [
+    'site_name' => 'Snipe-IT Lab',
+    'email_domain' => 'projet.lan',
+    'email_from_name' => 'Snipe-IT',
+    'email_from_addr' => 'noreply@projet.lan',
+    'mail_driver' => 'smtp',
+    'mail_host' => 'mailhog',
+    'mail_port' => '1025',
+    'mail_username' => null,
+    'mail_password' => null,
+    'mail_encryption' => null,
+];
+
+foreach (\$settings as \$key => \$value) {
+    \App\Models\Setting::updateOrCreate(['key' => \$key], ['value' => \$value]);
+}
+
+echo 'SMTP configuré avec succès';
+"
 
 # Configuration de l'intégration LDAP
 echo "Configuration de l'intégration LDAP..."
@@ -23,3 +46,4 @@ echo "Synchronisation des utilisateurs LDAP..."
 php artisan snipeit:ldap:sync
 
 echo "Configuration Snipe-IT terminée avec succès !"
+echo "Admin créé : admin@projet.lan / admin123"
