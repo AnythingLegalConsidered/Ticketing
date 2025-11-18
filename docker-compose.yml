@@ -94,8 +94,10 @@ services:
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - APP_URL=http://snipeit.${DOMAIN}
       - APP_KEY=${SNIPEIT_APP_KEY}
+      - LDAP_ROOT_PASSWORD=${LDAP_ROOT_PASSWORD}
     volumes:
       - snipeit_data:/var/lib/snipeit
+      - ./snipe-it/configure_snipeit.sh:/configure_snipeit.sh:ro
     networks:
       - it_stack_net
     restart: unless-stopped
@@ -179,9 +181,11 @@ services:
       - ELASTICSEARCH_URL=http://zammad-elasticsearch:9200
       - TZ=${TZ}
       - REDIS_URL=redis://zammad-redis:6379
+      - LDAP_ROOT_PASSWORD=${LDAP_ROOT_PASSWORD}
     command: ["zammad-railsserver"]
     volumes:
       - zammad_data:/opt/zammad/
+      - ./zammad/configure_zammad.rb:/configure_zammad.rb:ro
     networks:
       it_stack_net:
         aliases:
