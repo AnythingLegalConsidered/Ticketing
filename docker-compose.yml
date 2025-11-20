@@ -125,7 +125,7 @@ services:
       - MAIL_USERNAME=
       - MAIL_PASSWORD=
       - MAIL_ENCRYPTION=
-      - MAIL_FROM_ADDR=noreply@projet.lan
+      - MAIL_FROM_ADDR=noreply@ticketing.lan
       - MAIL_FROM_NAME=Snipe-IT
     volumes:
       - snipeit_data:/var/lib/snipeit

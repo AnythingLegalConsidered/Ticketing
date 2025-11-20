@@ -51,7 +51,7 @@ graph TD
 
 *(If the diagram above does not render, here is the text view:)*
 
-*   **Entry Point:** Nginx (Reverse Proxy) handles routing `*.projet.lan`.
+*   **Entry Point:** Nginx (Reverse Proxy) handles routing `*.ticketing.lan`.
 *   **Application Layer:** Zammad (Ticketing), Snipe-IT (Inventory).
 *   **Management Layer:** phpLDAPadmin (Directory UI), Dozzle (Logs), Uptime Kuma (Monitoring).
 *   **Backend Services:** OpenLDAP (Auth), PostgreSQL/MySQL (Databases), Elasticsearch, Redis.
@@ -86,7 +86,7 @@ Add the local domains to your hosts file to access services.
 *   **Linux/Mac:** `/etc/hosts`
 
 ```text
-127.0.0.1 zammad.projet.lan snipeit.projet.lan mail.projet.lan monitor.projet.lan logs.projet.lan ldap.projet.lan
+127.0.0.1 zammad.ticketing.lan snipeit.ticketing.lan mail.ticketing.lan monitor.ticketing.lan logs.ticketing.lan ldap.ticketing.lan
 ```
 
 ### 4. Start the stack
@@ -109,16 +109,16 @@ make setup
 
 | Service | URL | Credentials / Status |
 | :--- | :--- | :--- |
-| **Zammad** | `http://zammad.projet.lan` | **Login:** `admin@projet.lan` <br> **Pass:** `admin123` |
-| **Snipe-IT** | `http://snipeit.projet.lan` | **Status:** Complete Wizard <br> **DB:** `snipeit` / `snipeit` / `snipeit_password` |
-| **phpLDAPadmin** | `http://ldap.projet.lan` | **Login:** `cn=admin,dc=projet,dc=lan` <br> **Pass:** (See `.env`) |
-| **Uptime Kuma** | `http://monitor.projet.lan` | **Status:** Create admin account |
-| **Dozzle** | `http://logs.projet.lan` | **Status:** Free access |
-| **MailHog** | `http://mail.projet.lan` | **Status:** Free access |
+| **Zammad** | `http://zammad.ticketing.lan` | **Login:** `admin@ticketing.lan` <br> **Pass:** `admin123` |
+| **Snipe-IT** | `http://snipeit.ticketing.lan` | **Status:** Complete Wizard <br> **DB:** `snipeit` / `snipeit` / `snipeit_password` |
+| **phpLDAPadmin** | `http://ldap.ticketing.lan` | **Login:** `cn=admin,dc=ticketing,dc=lan` <br> **Pass:** (See `.env`) |
+| **Uptime Kuma** | `http://monitor.ticketing.lan` | **Status:** Create admin account |
+| **Dozzle** | `http://logs.ticketing.lan` | **Status:** Free access |
+| **MailHog** | `http://mail.ticketing.lan` | **Status:** Free access |
 
 ### 👥 LDAP User Management
 Users are pre-populated, but you can manage them via **phpLDAPadmin**:
-1.  Go to `http://ldap.projet.lan`.
+1.  Go to `http://ldap.ticketing.lan`.
 2.  Log in with the Admin DN.
 3.  **Create new users manually** via the graphical interface (Create a child entry -> Generic: User Account).
 
@@ -174,7 +174,7 @@ docker compose down -v               # Remove everything
 
 ## 🔧 Customization
 **Environment Variables (.env):**
-*   `DOMAIN=projet.lan`: Base domain.
+*   `DOMAIN=ticketing.lan`: Base domain.
 *   `LDAP_ROOT_PASSWORD`: Password for `cn=admin`.
 *   `POSTGRES_PASSWORD` / `MYSQL_PASSWORD`: DB passwords.
 

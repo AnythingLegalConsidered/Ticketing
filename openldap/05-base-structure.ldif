@@ -1,12 +1,12 @@
-dn: dc=projet,dc=lan
+dn: dc=ticketing,dc=lan
 objectClass: top
 objectClass: dcObject
 objectClass: organization
-o: Projet LAN
-dc: projet
+o: Ticketing LAN
+dc: ticketing
 
 # admin user
-dn: cn=admin,dc=projet,dc=lan
+dn: cn=admin,dc=ticketing,dc=lan
 objectClass: simpleSecurityObject
 objectClass: organizationalRole
 cn: admin
@@ -14,10 +14,10 @@ description: LDAP administrator
 userPassword: {SSHA}changeme
 
 # organizational units
-dn: ou=users,dc=projet,dc=lan
+dn: ou=users,dc=ticketing,dc=lan
 objectClass: organizationalUnit
 ou: users
 
-dn: ou=groups,dc=projet,dc=lan
+dn: ou=groups,dc=ticketing,dc=lan
 objectClass: organizationalUnit
 ou: groups

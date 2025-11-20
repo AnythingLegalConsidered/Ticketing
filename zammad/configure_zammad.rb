@@ -29,11 +29,11 @@ puts "Vérification/Création de l'utilisateur Admin..."
 admin_role = Role.find_by(name: 'Admin')
 agent_role = Role.find_by(name: 'Agent')
 
-user = User.find_or_create_by(email: 'admin@projet.lan')
+user = User.find_or_create_by(email: 'admin@ticketing.lan')
 user.update!(
   firstname: 'Admin',
   lastname: 'User',
-  login: 'admin@projet.lan',
+  login: 'admin@ticketing.lan',
   password: 'admin123',
   active: true,
   organization: org,

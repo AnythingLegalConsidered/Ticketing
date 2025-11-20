@@ -7,7 +7,7 @@ Ce guide détaille les étapes pas-à-pas pour configurer les services après le
 ## 1. Snipe-IT (Gestion de Parc)
 
 ### A. Assistant d'Installation (Premier accès)
-1. Accédez à **http://snipeit.projet.lan**.
+1. Accédez à **http://snipeit.ticketing.lan**.
 2. **Pre-Flight Check** : Tous les indicateurs devraient être verts. Cliquez sur **Next: Create Database Tables**.
 3. **Create User** :
    - **Site Name** : `Projet LAN`
@@ -45,9 +45,9 @@ Pour permettre aux utilisateurs (Techs, Clients) de se connecter :
 ## 2. Zammad (Ticketing)
 
 ### A. Connexion Initiale
-1. Accédez à **http://zammad.projet.lan**.
+1. Accédez à **http://zammad.ticketing.lan**.
 2. Connectez-vous avec le compte administrateur pré-créé par le script :
-   - **Email** : `admin@projet.lan`
+   - **Email** : `admin@ticketing.lan`
    - **Mot de passe** : `admin123`
 
 ### B. Intégration LDAP
@@ -78,14 +78,14 @@ Pour que Zammad envoie des notifications :
    - **Utilisateur** : (Laisser vide)
    - **Mot de passe** : (Laisser vide)
 3. Zammad enverra désormais les notifications via MailHog.
-4. Vous pouvez voir les emails envoyés sur **http://mail.projet.lan**.
+4. Vous pouvez voir les emails envoyés sur **http://mail.ticketing.lan**.
 
 ---
 
 ## 3. Uptime Kuma (Monitoring)
 
 ### A. Création de compte
-1. Accédez à **http://monitor.projet.lan**.
+1. Accédez à **http://monitor.ticketing.lan**.
 2. Créez votre compte administrateur local (ex: `admin` / `password`).
 
 ### B. Ajouter des Sondes (Monitors)
@@ -116,6 +116,6 @@ Comme Uptime Kuma est dans le même réseau Docker (`it_stack_net`), il peut con
 
 ## 4. Dozzle (Logs)
 
-1. Accédez à **http://logs.projet.lan**.
+1. Accédez à **http://logs.ticketing.lan**.
 2. Aucune configuration n'est nécessaire.
 3. Cliquez sur un conteneur à gauche (ex: `zammad-app`) pour voir ses logs en temps réel.
