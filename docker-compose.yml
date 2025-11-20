@@ -23,6 +23,8 @@ services:
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
     depends_on:
       - mailhog
+      - zammad-nginx
+      - snipe-it
     networks:
       - it_stack_net
     restart: unless-stopped
@@ -40,26 +42,42 @@ services:
     volumes:
       - ldap_data:/var/lib/ldap
       - ldap_config:/etc/ldap/slapd.d
-      - ./openldap/test-user.ldif:/tmp/test-user.ldif:ro
     networks:
       - it_stack_net
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "ldapsearch", "-x", "-H", "ldap://localhost", "-b", "", "-s", "base", "(objectclass=*)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  ldap-bootstrap:
-    image: osixia/openldap:1.5.0
-    container_name: ldap-bootstrap
+  setup:
+    image: debian:bookworm-slim
+    container_name: setup
     depends_on:
-      - openldap
+      openldap:
+        condition: service_healthy
+      zammad-app:
+        condition: service_healthy
+      snipe-it:
+        condition: service_healthy
     networks:
       - it_stack_net
-    restart: "no"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock # ⚠️ Security risk: gives root access to host. Required for orchestration.
+      - ./scripts:/scripts
+      - ./openldap:/openldap
+      - ./zammad:/zammad
     environment:
       - DOMAIN=${DOMAIN}
       - LDAP_ROOT_PASSWORD=${LDAP_ROOT_PASSWORD}
-    volumes:
-      - ./openldap/05-base-structure.ldif:/ldifs/05-base-structure.ldif:ro
-      - ./openldap/bootstrap.sh:/ldifs/bootstrap.sh:ro
-    entrypoint: ["sh","/ldifs/bootstrap.sh"]
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+    command: ["/bin/bash", "/scripts/entrypoint.sh"]
 
   mariadb-snipeit:
     image: mariadb:10.6
@@ -76,13 +94,19 @@ services:
     networks:
       - it_stack_net
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   snipe-it:
     image: snipe/snipe-it:v6.3.3
     container_name: snipe-it
     hostname: snipe-it
     depends_on:
-      - mariadb-snipeit
+      mariadb-snipeit:
+        condition: service_healthy
     environment:
       - TZ=${TZ}
       - PUID=${PUID}
@@ -95,12 +119,44 @@ services:
       - APP_URL=http://snipeit.${DOMAIN}
       - APP_KEY=${SNIPEIT_APP_KEY}
       - LDAP_ROOT_PASSWORD=${LDAP_ROOT_PASSWORD}
+      - MAIL_DRIVER=smtp
+      - MAIL_HOST=mailhog
+      - MAIL_PORT=1025
+      - MAIL_USERNAME=
+      - MAIL_PASSWORD=
+      - MAIL_ENCRYPTION=
+      - MAIL_FROM_ADDR=noreply@projet.lan
+      - MAIL_FROM_NAME=Snipe-IT
     volumes:
       - snipeit_data:/var/lib/snipeit
-      - ./snipe-it/configure_snipeit.sh:/configure_snipeit.sh:ro
     networks:
       - it_stack_net
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:80/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  uptime-kuma:
+    image: louislam/uptime-kuma:1
+    container_name: uptime-kuma
+    hostname: uptime-kuma
+    restart: unless-stopped
+    volumes:
+      - uptime_kuma_data:/app/data
+    networks:
+      - it_stack_net
+
+  dozzle:
+    image: amir20/dozzle:latest
+    container_name: dozzle
+    hostname: dozzle
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - it_stack_net
 
   # --- ZAMMAD STACK ---
   zammad-init:
@@ -109,8 +165,10 @@ services:
     hostname: zammad-init
     restart: "no"
     depends_on:
-      - zammad-postgres
-      - zammad-elasticsearch
+      zammad-postgres:
+        condition: service_healthy
+      zammad-elasticsearch:
+        condition: service_healthy
     environment:
       - POSTGRESQL_DB=${POSTGRES_DB}
       - POSTGRESQL_HOST=zammad-postgres
@@ -140,6 +198,11 @@ services:
       - zammad_postgres_data:/var/lib/postgresql/data
     networks:
       - it_stack_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   zammad-redis:
     image: redis:6-alpine
@@ -163,6 +226,11 @@ services:
       - zammad_es_data:/usr/share/elasticsearch/data
     networks:
       - it_stack_net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:9200/_cluster/health | grep -q 'status.*\\(green\\|yellow\\)'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   
   zammad-app:
     image: zammad/zammad:6.2.0-14
@@ -170,9 +238,14 @@ services:
     hostname: zammad-app
     restart: unless-stopped
     depends_on:
-      - zammad-postgres
-      - zammad-elasticsearch
+      zammad-init:
+        condition: service_completed_successfully
+      zammad-postgres:
+        condition: service_healthy
+      zammad-elasticsearch:
+        condition: service_healthy
     environment:
+      - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@zammad-postgres:5432/${POSTGRES_DB}
       - POSTGRESQL_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@zammad-postgres:5432/${POSTGRES_DB}
       - POSTGRESQL_HOST=zammad-postgres
       - POSTGRESQL_USER=${POSTGRES_USER}
@@ -190,6 +263,11 @@ services:
       it_stack_net:
         aliases:
           - zammad-railsserver
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   zammad-scheduler:
     image: zammad/zammad:6.2.0-14
@@ -261,3 +339,4 @@ volumes:
   zammad_data:
   zammad_postgres_data:
   zammad_es_data:
+  uptime_kuma_data:

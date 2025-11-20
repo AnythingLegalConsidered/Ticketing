@@ -1,0 +1,15 @@
+{
+  "organization": {
+    "name": "Projet LAN"
+  },
+  "admin": {
+    "firstname": "Admin",
+    "lastname": "User",
+    "email": "admin@projet.lan",
+    "password": "admin123"
+  },
+  "settings": {
+    "system_init_done": true,
+    "timezone_default": "Europe/Paris"
+  }
+}

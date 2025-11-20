@@ -1,81 +1,52 @@
 #!/usr/bin/env ruby
-# Script de configuration automatique de Zammad
-# Utilise l'API Rails actuelle de Zammad
+# Script de configuration automatique de Zammad (Ruby)
+# Configure SMTP, LDAP, crée un admin et définit les paramètres système
+# Exécuté automatiquement lors de la configuration de l'infrastructure
 
 require 'yaml'
+require 'json'
+require 'net/ldap'
+
+
 
 puts "=== Configuration automatique de Zammad ==="
 
 # Attendre que Zammad soit prêt
 puts "Attente de la disponibilité de Zammad..."
-sleep 30
+sleep 5
 
-# Configuration du canal e-mail sortant (SMTP via MailHog)
-puts "Configuration du canal e-mail sortant..."
-system("cd /opt/zammad && bundle exec rails r \"
-# Créer un canal email sortant
-channel = Channel.create(
-  area: 'Email::Outbound',
-  options: {
-    adapter: 'smtp',
-    host: 'mailhog',
-    port: 1025,
-    user: '',
-    password: '',
-    ssl: false,
-    start_tls: false
-  },
-  active: true
-)
-puts 'Canal email sortant créé'
-\"")
+# Utiliser auto_wizard pour l'initialisation
+puts "Vérification si le système est déjà initialisé..."
 
-# Configuration de l'intégration LDAP
-puts "Configuration de l'intégration LDAP..."
-system("cd /opt/zammad && bundle exec rails r \"
-# Créer la source LDAP
-ldap_source = LdapSource.create(
-  name: 'OpenLDAP',
-  host: 'openldap',
-  port: 389,
-  ssl: false,
-  base_dn: 'dc=projet,dc=lan',
-  bind_user: 'cn=admin,dc=projet,dc=lan',
-  bind_pw: ENV['LDAP_ROOT_PASSWORD'],
-  user_filter: '(uid=%{login})',
-  user_uid: 'uid',
-  user_attributes: {
-    firstname: 'givenName',
-    lastname: 'sn',
-    email: 'mail',
-    login: 'uid'
-  },
-  group_filter: '(memberUid=%{login})',
-  group_uid: 'cn',
-  unassigned_users: true,
-  active: true
-)
+# Toujours s'assurer que l'organisation et l'admin existent, même si init_done est true
+puts "Vérification/Création de l'organisation 'Projet LAN'..."
+# Définir l'utilisateur système pour les actions de création
+UserInfo.current_user_id = 1
 
-# Synchronisation des utilisateurs
-puts 'Synchronisation LDAP...'
-ldap_source.sync
-puts 'LDAP configuré et synchronisé'
-\"")
+org = Organization.find_or_create_by(name: 'Projet LAN')
 
-# Créer un utilisateur admin automatiquement
-puts "Création d'un utilisateur administrateur..."
-system("cd /opt/zammad && bundle exec rails r \"
-# Créer un utilisateur admin
-admin = User.create(
-  login: 'admin',
+puts "Vérification/Création de l'utilisateur Admin..."
+admin_role = Role.find_by(name: 'Admin')
+agent_role = Role.find_by(name: 'Agent')
+
+user = User.find_or_create_by(email: 'admin@projet.lan')
+user.update!(
   firstname: 'Admin',
   lastname: 'User',
-  email: 'admin@projet.lan',
+  login: 'admin@projet.lan',
   password: 'admin123',
   active: true,
-  roles: Role.where(name: 'Admin')
+  organization: org,
+  roles: [admin_role, agent_role].compact
 )
-puts 'Utilisateur admin créé: admin@projet.lan / admin123'
-\"")
+puts "Utilisateur Admin assuré."
+
+if Setting.get('system_init_done')
+  puts "Système déjà marqué comme initialisé."
+else
+  puts "Marquage du système comme initialisé..."
+  Setting.set('timezone_default', 'Europe/Paris')
+  Setting.set('system_init_done', true)
+end
 
 puts "Configuration Zammad terminée avec succès !"

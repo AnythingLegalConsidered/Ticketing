@@ -20,7 +20,8 @@ up: ## Démarrer tous les services
 	@echo "$(GREEN)🚀 Démarrage de la stack IT...$(NC)"
 	docker compose -f $(COMPOSE_FILE) up -d
 	@echo "$(GREEN)✅ Stack démarrée !$(NC)"
-	@echo "$(YELLOW)💡 Pensez à exécuter 'make configure' pour configurer automatiquement$(NC)"
+	@echo "$(YELLOW)💡 Le conteneur 'setup' configure automatiquement les services$(NC)"
+	@echo "$(YELLOW)💡 Suivez les logs avec 'make logs-setup'$(NC)"
 
 down: ## Arrêter tous les services
 	@echo "$(YELLOW)🛑 Arrêt de la stack IT...$(NC)"
@@ -49,9 +50,10 @@ clean: ## Supprimer tous les conteneurs et volumes (ATTENTION: données perdues)
 		echo "$(YELLOW)Opération annulée$(NC)"; \
 	fi
 
-configure: ## Configurer automatiquement les services (SMTP + LDAP)
+configure: ## Afficher les logs du conteneur de configuration automatique
 	@echo "$(GREEN)⚙️  Configuration automatique en cours...$(NC)"
-	./configure.sh
+	@echo "$(YELLOW)Le conteneur 'setup' gère la configuration automatiquement$(NC)"
+	docker compose -f $(COMPOSE_FILE) logs -f setup
 
 build: ## Rebuild les images personnalisées
 	@echo "$(GREEN)🔨 Rebuild des images...$(NC)"
@@ -69,16 +71,9 @@ restart-%: ## Redémarrer un service spécifique (ex: make restart-nginx)
 shell-%: ## Ouvrir un shell dans un conteneur (ex: make shell-zammad-app)
 	docker compose -f $(COMPOSE_FILE) exec $* bash
 
-setup: ## Setup complet (build + up + configure)
+setup: ## Setup complet (build + up + logs du setup)
 	@echo "$(GREEN)🚀 Setup complet de la stack IT...$(NC)"
 	make build
 	make up
-	@echo "$(YELLOW)⏳ Attente du démarrage complet (60s)...$(NC)"
-	sleep 60
+	@echo "$(YELLOW)⏳ Configuration automatique en cours...$(NC)"
 	make configure
-	@echo "$(GREEN)✅ Setup terminé !$(NC)"
-	@echo "$(YELLOW)🌐 Services accessibles :$(NC)"
-	@echo "  - Zammad: http://zammad.projet.lan"
-	@echo "  - Snipe-IT: http://snipeit.projet.lan"
-	@echo "  - MailHog: http://mail.projet.lan"
-	@echo "  - Utilisateur test: johndoe / password"
