@@ -334,8 +334,6 @@ services:
     restart: unless-stopped
     depends_on:
       - zammad-app
-    ports:
-      - "127.0.0.1:8080:8080"
     volumes:
       - zammad_data:/opt/zammad/
     networks:
