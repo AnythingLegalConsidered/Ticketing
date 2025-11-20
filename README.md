@@ -123,9 +123,10 @@ Users are pre-populated, but you can manage them via **phpLDAPadmin**:
 3.  **Create new users manually** via the graphical interface (Create a child entry -> Generic: User Account).
 
 **Default Test Users:**
-*   **Tech N1:** thomas.dubois, sarah.martin
-*   **Tech N2:** lucas.bernard, julie.petit
-*   **Clients:** pierre.durand, marie.leroy
+*   **Tech N1:** chris.letech
+*   **Tech N2:** robert.lemodo
+*   **Tech N3:** bob.ladmin
+*   **Clients:** jean.user
 *   **Default password:** `password`
 
 ---
