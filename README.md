@@ -22,7 +22,7 @@ The infrastructure is deployed automatically, but fine-tuning of applications (L
 
 ## 🏗️ Architecture
 
-The infrastructure is organized into functional layers, accessible through a single entry point.
+The infrastructure is organized into functional layers, accessible through different ports on localhost.
 
 ```mermaid
 graph TD
@@ -51,7 +51,7 @@ graph TD
 
 *(If the diagram above does not render, here is the text view:)*
 
-*   **Entry Point:** Nginx (Reverse Proxy) handles routing `*.ticketing.lan`.
+*   **Entry Point:** Nginx (Reverse Proxy) handles routing via ports (8080-8085).
 *   **Application Layer:** Zammad (Ticketing), Snipe-IT (Inventory).
 *   **Management Layer:** phpLDAPadmin (Directory UI), Dozzle (Logs), Uptime Kuma (Monitoring).
 *   **Backend Services:** OpenLDAP (Auth), PostgreSQL/MySQL (Databases), Elasticsearch, Redis.
@@ -70,8 +70,8 @@ graph TD
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/your-username/it-stack-project.git
-cd it-stack-project
+git clone https://github.com/AnythingLegalConsidered/Ticketing
+cd Ticketing
 ```
 
 ### 2. Configure the environment
@@ -81,13 +81,7 @@ cp .env.example .env
 ```
 
 ### 3. DNS Configuration (Hosts file)
-Add the local domains to your hosts file to access services.
-*   **Windows:** `C:\Windows\System32\drivers\etc\hosts` (Run PowerShell as Admin)
-*   **Linux/Mac:** `/etc/hosts`
-
-```text
-127.0.0.1 zammad.ticketing.lan snipeit.ticketing.lan mail.ticketing.lan monitor.ticketing.lan logs.ticketing.lan ldap.ticketing.lan
-```
+**Not required anymore!** The services are now accessible via different ports on localhost.
 
 ### 4. Start the stack
 ```bash
@@ -99,7 +93,7 @@ make setup
 ### 5. Initialization
 *   **Automatic:** The setup container will populate OpenLDAP with test data and create the initial Admin user for Zammad.
 *   **Manual Steps (Required):**
-    *   **Snipe-IT:** Go to `http://snipeit.projet.lan` and complete the installation wizard.
+    *   **Snipe-IT:** Go to `http://localhost:8081` and complete the installation wizard.
     *   **Zammad:** Log in, then configure **LDAP** and **SMTP** integrations in the settings using the credentials below.
     *   **Uptime Kuma:** Create your admin account and configure probes.
 
@@ -109,16 +103,16 @@ make setup
 
 | Service | URL | Credentials / Status |
 | :--- | :--- | :--- |
-| **Zammad** | `http://zammad.ticketing.lan` | **Login:** `admin@ticketing.lan` <br> **Pass:** `admin123` |
-| **Snipe-IT** | `http://snipeit.ticketing.lan` | **Status:** Complete Wizard <br> **DB:** `snipeit` / `snipeit` / `snipeit_password` |
-| **phpLDAPadmin** | `http://ldap.ticketing.lan` | **Login:** `cn=admin,dc=ticketing,dc=lan` <br> **Pass:** (See `.env`) |
-| **Uptime Kuma** | `http://monitor.ticketing.lan` | **Status:** Create admin account |
-| **Dozzle** | `http://logs.ticketing.lan` | **Status:** Free access |
-| **MailHog** | `http://mail.ticketing.lan` | **Status:** Free access |
+| **Zammad** | `http://localhost:8080` | **Login:** `admin@ticketing.lan` <br> **Pass:** `admin123` |
+| **Snipe-IT** | `http://localhost:8081` | **Status:** Complete Wizard <br> **DB:** `snipeit` / `snipeit` / `snipeit_password` |
+| **phpLDAPadmin** | `http://localhost:8082` | **Login:** `cn=admin,dc=ticketing,dc=lan` <br> **Pass:** (See `.env`) |
+| **Uptime Kuma** | `http://localhost:8083` | **Status:** Create admin account |
+| **Dozzle** | `http://localhost:8084` | **Status:** Free access |
+| **MailHog** | `http://localhost:8085` | **Status:** Free access |
 
 ### 👥 LDAP User Management
 Users are pre-populated, but you can manage them via **phpLDAPadmin**:
-1.  Go to `http://ldap.ticketing.lan`.
+1.  Go to `http://localhost:8082`.
 2.  Log in with the Admin DN.
 3.  **Create new users manually** via the graphical interface (Create a child entry -> Generic: User Account).
 
