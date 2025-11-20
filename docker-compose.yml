@@ -25,6 +25,9 @@ services:
       - mailhog
       - zammad-nginx
       - snipe-it
+      - phpldapadmin
+      - dozzle
+      - uptime-kuma
     networks:
       - it_stack_net
     restart: unless-stopped
@@ -158,6 +161,16 @@ services:
     restart: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - it_stack_net
+
+  uptime-kuma:
+    image: louislam/uptime-kuma:1.23.13
+    container_name: uptime-kuma
+    hostname: uptime-kuma
+    restart: unless-stopped
+    volumes:
+      - uptime_kuma_data:/app/data
     networks:
       - it_stack_net
 
