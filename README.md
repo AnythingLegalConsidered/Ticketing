@@ -78,7 +78,7 @@ graph TB
 3. **Add domains to your hosts file:**
    ```powershell
    # Windows (PowerShell as admin)
-   Add-Content -Path "C:\Windows\System32\drivers\etc\hosts" -Value "127.0.0.1 zammad.projet.lan snipeit.projet.lan mail.projet.lan monitor.projet.lan logs.projet.lan"
+   Add-Content -Path "C:\Windows\System32\drivers\etc\hosts" -Value "127.0.0.1 zammad.projet.lan snipeit.projet.lan mail.projet.lan monitor.projet.lan logs.projet.lan ldap.projet.lan"
    ```
 
 4. **Start the complete stack:**
@@ -106,6 +106,7 @@ graph TB
 | **Zammad** | http://zammad.projet.lan | **Login:** `admin@projet.lan` <br> **Pass:** `admin123` <br> *(To configure: LDAP, SMTP)* |
 | **Snipe-IT** | http://snipeit.projet.lan | **Status:** Installation wizard to complete <br> **DB:** `snipeit` / `snipeit` / `snipeit_password` |
 | **Uptime Kuma** | http://monitor.projet.lan | **Status:** Create admin account |
+| **phpLDAPadmin** | http://ldap.projet.lan | **Status:** Login with LDAP admin credentials |
 | **Dozzle** | http://logs.projet.lan | **Status:** Free access |
 | **MailHog** | http://mail.projet.lan | **Status:** Free access |
 
@@ -293,7 +294,7 @@ graph TB
 3. **Ajoutez les domaines à votre fichier hosts :**
    ```powershell
    # Windows (PowerShell en admin)
-   Add-Content -Path "C:\Windows\System32\drivers\etc\hosts" -Value "127.0.0.1 zammad.projet.lan snipeit.projet.lan mail.projet.lan monitor.projet.lan logs.projet.lan"
+   Add-Content -Path "C:\Windows\System32\drivers\etc\hosts" -Value "127.0.0.1 zammad.projet.lan snipeit.projet.lan mail.projet.lan monitor.projet.lan logs.projet.lan ldap.projet.lan"
    ```
 
 4. **Démarrez la stack complète :**
@@ -321,6 +322,7 @@ graph TB
 | **Zammad** | http://zammad.projet.lan | **Login:** `admin@projet.lan` <br> **Pass:** `admin123` <br> *(À configurer : LDAP, SMTP)* |
 | **Snipe-IT** | http://snipeit.projet.lan | **État:** Assistant d'installation à compléter <br> **DB:** `snipeit` / `snipeit` / `snipeit_password` |
 | **Uptime Kuma** | http://monitor.projet.lan | **État:** Créer compte admin |
+| **phpLDAPadmin** | http://ldap.projet.lan | **État:** Connexion avec creds admin LDAP |
 | **Dozzle** | http://logs.projet.lan | **État:** Accès libre |
 | **MailHog** | http://mail.projet.lan | **État:** Accès libre |
 

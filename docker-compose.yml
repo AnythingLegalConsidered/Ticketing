@@ -138,15 +138,18 @@ services:
       timeout: 10s
       retries: 5
 
-  uptime-kuma:
-    image: louislam/uptime-kuma:1
-    container_name: uptime-kuma
-    hostname: uptime-kuma
-    restart: unless-stopped
-    volumes:
-      - uptime_kuma_data:/app/data
+  phpldapadmin:
+    image: osixia/phpldapadmin:latest
+    container_name: phpldapadmin
+    hostname: phpldapadmin
+    environment:
+      - PHPLDAPADMIN_LDAP_HOSTS=openldap
+      - PHPLDAPADMIN_HTTPS=false
+    depends_on:
+      - openldap
     networks:
       - it_stack_net
+    restart: unless-stopped
 
   dozzle:
     image: amir20/dozzle:latest
