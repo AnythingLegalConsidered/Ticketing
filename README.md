@@ -22,7 +22,7 @@ The infrastructure is deployed automatically, but fine-tuning of applications (L
 
 ## 🏗️ Architecture
 
-The infrastructure is organized into functional layers, accessible through different ports on localhost.
+The infrastructure is organized into functional layers, accessible through subdomains on port 80.
 
 ```mermaid
 graph TD
@@ -51,7 +51,7 @@ graph TD
 
 *(If the diagram above does not render, here is the text view:)*
 
-*   **Entry Point:** Nginx (Reverse Proxy) handles routing via ports (8080-8085).
+*   **Entry Point:** Nginx (Reverse Proxy) handles routing via subdomains (zammad.lvh.me, snipeit.lvh.me, etc.).
 *   **Application Layer:** Zammad (Ticketing), Snipe-IT (Inventory).
 *   **Management Layer:** phpLDAPadmin (Directory UI), Dozzle (Logs), Uptime Kuma (Monitoring).
 *   **Backend Services:** OpenLDAP (Auth), PostgreSQL/MySQL (Databases), Elasticsearch, Redis.
@@ -80,8 +80,8 @@ Copy the example file and modify variables if needed (domain, passwords):
 cp .env.example .env
 ```
 
-### 3. DNS Configuration (Hosts file)
-**Not required anymore!** The services are now accessible via different ports on localhost.
+### 3. DNS Configuration
+**No configuration required!** Services are accessible via lvh.me subdomains (automatically resolve to 127.0.0.1).
 
 ### 4. Start the stack
 ```bash
@@ -93,7 +93,7 @@ make setup
 ### 5. Initialization
 *   **Automatic:** The setup container will populate OpenLDAP with test data and create the initial Admin user for Zammad.
 *   **Manual Steps (Required):**
-    *   **Snipe-IT:** Go to `http://localhost:8081` and complete the installation wizard.
+    *   **Snipe-IT:** Go to `http://snipeit.lvh.me/setup` and complete the installation wizard.
     *   **Zammad:** Log in, then configure **LDAP** and **SMTP** integrations in the settings using the credentials below.
     *   **Uptime Kuma:** Create your admin account and configure probes.
 
@@ -103,16 +103,16 @@ make setup
 
 | Service | URL | Credentials / Status |
 | :--- | :--- | :--- |
-| **Zammad** | `http://localhost:8080` | **Login:** `admin@ticketing.lan` <br> **Pass:** `admin123` |
-| **Snipe-IT** | `http://localhost:8081` | **Status:** Complete Wizard <br> **DB:** `snipeit` / `snipeit` / `snipeit_password` |
-| **phpLDAPadmin** | `http://localhost:8082` | **Login:** `cn=admin,dc=ticketing,dc=lan` <br> **Pass:** (See `.env`) |
-| **Uptime Kuma** | `http://localhost:8083` | **Status:** Create admin account |
-| **Dozzle** | `http://localhost:8084` | **Status:** Free access |
-| **MailHog** | `http://localhost:8085` | **Status:** Free access |
+| **Zammad** | `http://zammad.lvh.me` | **Login:** `admin@ticketing.lan` <br> **Pass:** `admin123` |
+| **Snipe-IT** | `http://snipeit.lvh.me` | **Status:** Complete Wizard <br> **DB:** `snipeit` / `snipeit` / `snipeit_password` |
+| **phpLDAPadmin** | `http://ldap.lvh.me` | **Login:** `cn=admin,dc=ticketing,dc=lan` <br> **Pass:** (See `.env`) |
+| **Uptime Kuma** | `http://uptime.lvh.me` | **Status:** Create admin account |
+| **Dozzle** | `http://dozzle.lvh.me` | **Status:** Free access |
+| **MailHog** | `http://mailhog.lvh.me` | **Status:** Free access |
 
 ### 👥 LDAP User Management
 Users are pre-populated, but you can manage them via **phpLDAPadmin**:
-1.  Go to `http://localhost:8082`.
+1.  Go to `http://ldap.lvh.me`.
 2.  Log in with the Admin DN.
 3.  **Create new users manually** via the graphical interface (Create a child entry -> Generic: User Account).
 

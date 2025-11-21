@@ -17,12 +17,7 @@ services:
     container_name: nginx
     hostname: nginx
     ports:
-      - "8080:8080"
-      - "8081:8081"
-      - "8082:8082"
-      - "8083:8083"
-      - "8084:8084"
-      - "8085:8085"
+      - "80:80"
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
     depends_on:
@@ -123,7 +118,8 @@ services:
       - MYSQL_DATABASE=${MYSQL_DATABASE}
       - MYSQL_USER=${MYSQL_USER}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-      - APP_URL=http://localhost:8081
+      - APP_URL=http://snipeit.lvh.me
+      - APP_TRUSTED_PROXIES=*          # Added to trust all proxies
       - APP_KEY=${SNIPEIT_APP_KEY}
       - LDAP_ROOT_PASSWORD=${LDAP_ROOT_PASSWORD}
       - MAIL_DRIVER=smtp

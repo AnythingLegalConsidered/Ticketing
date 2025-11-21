@@ -7,7 +7,7 @@ Ce guide détaille les étapes pas-à-pas pour configurer les services après le
 ## 1. Snipe-IT (Gestion de Parc)
 
 ### A. Assistant d'Installation (Premier accès)
-1. Accédez à **http://localhost:8081**.
+1. Accédez à **http://snipeit.lvh.me/setup**.
 2. **Pre-Flight Check** : Tous les indicateurs devraient être verts. Cliquez sur **Next: Create Database Tables**.
 3. **Create User** :
    - **Site Name** : `Ticketing LAN`
@@ -45,7 +45,7 @@ Pour permettre aux utilisateurs (Techs, Clients) de se connecter :
 ## 2. Zammad (Ticketing)
 
 ### A. Connexion Initiale
-1. Accédez à **http://localhost:8080**.
+1. Accédez à **http://zammad.lvh.me**.
 2. Connectez-vous avec le compte administrateur pré-créé par le script :
    - **Email** : `admin@ticketing.lan`
    - **Mot de passe** : `admin123`
@@ -78,14 +78,14 @@ Pour que Zammad envoie des notifications :
    - **Utilisateur** : (Laisser vide)
    - **Mot de passe** : (Laisser vide)
 3. Zammad enverra désormais les notifications via MailHog.
-4. Vous pouvez voir les emails envoyés sur **http://localhost:8085**.
+4. Vous pouvez voir les emails envoyés sur **http://mailhog.lvh.me**.
 
 ---
 
 ## 3. Uptime Kuma (Monitoring)
 
 ### A. Création de compte
-1. Accédez à **http://localhost:8083**.
+1. Accédez à **http://uptime.lvh.me**.
 2. Créez votre compte administrateur local (ex: `admin` / `password`).
 
 ### B. Ajouter des Sondes (Monitors)
@@ -116,6 +116,6 @@ Comme Uptime Kuma est dans le même réseau Docker (`it_stack_net`), il peut con
 
 ## 4. Dozzle (Logs)
 
-1. Accédez à **http://localhost:8084**.
+1. Accédez à **http://dozzle.lvh.me**.
 2. Aucune configuration n'est nécessaire.
 3. Cliquez sur un conteneur à gauche (ex: `zammad-app`) pour voir ses logs en temps réel.
