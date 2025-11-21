@@ -1,7 +1,7 @@
 # Containerized Ticketing Infrastructure
 **Status:** Operational
 
-## 🌐 Language / Langue
+## 🌐 Language
 
 <details>
 <summary>🇺🇸 English</summary>
