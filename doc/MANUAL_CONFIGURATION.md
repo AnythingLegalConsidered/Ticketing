@@ -7,10 +7,10 @@ Ce guide détaille les étapes pas-à-pas pour configurer les services après le
 ## 1. Snipe-IT (Gestion de Parc)
 
 ### A. Assistant d'Installation (Premier accès)
-1. Accédez à **http://snipeit.ticketing.lan**.
+1. Accédez à **http://localhost:8081**.
 2. **Pre-Flight Check** : Tous les indicateurs devraient être verts. Cliquez sur **Next: Create Database Tables**.
 3. **Create User** :
-   - **Site Name** : `Projet LAN`
+   - **Site Name** : `Ticketing LAN`
    - **Default Currency** : `EUR`
    - **Admin User** : Créez votre compte administrateur local (ce sera le "Super Admin").
 4. Une fois terminé, connectez-vous avec ce compte.
@@ -25,9 +25,9 @@ Pour permettre aux utilisateurs (Techs, Clients) de se connecter :
    - **Active Directory** : `No` (Nous utilisons OpenLDAP)
    - **LDAP Server** : `ldap://openldap`
    - **Use TLS** : `No`
-   - **LDAP Bind Username** : `cn=admin,dc=projet,dc=lan`
+   - **LDAP Bind Username** : `cn=admin,dc=ticketing,dc=lan`
    - **LDAP Bind Password** : `YourStrongLdapPassword` (ou voir variable `LDAP_ROOT_PASSWORD` dans `.env`)
-   - **Base Bind DN** : `dc=projet,dc=lan`
+   - **Base Bind DN** : `dc=ticketing,dc=lan`
    - **LDAP Filter** : `&(objectClass=inetOrgPerson)`
    - **Username Field** : `uid`
    - **Last Name** : `sn`
@@ -45,7 +45,7 @@ Pour permettre aux utilisateurs (Techs, Clients) de se connecter :
 ## 2. Zammad (Ticketing)
 
 ### A. Connexion Initiale
-1. Accédez à **http://zammad.ticketing.lan**.
+1. Accédez à **http://localhost:8080**.
 2. Connectez-vous avec le compte administrateur pré-créé par le script :
    - **Email** : `admin@ticketing.lan`
    - **Mot de passe** : `admin123`
@@ -64,7 +64,7 @@ Pour permettre aux utilisateurs (Techs, Clients) de se connecter :
    - Vérifiez que **Nom** est mappé sur `sn`.
    - Vérifiez que **Email** est mappé sur `mail`.
 6. **Mappage des Rôles** (Optionnel mais recommandé) :
-   - Vous pouvez mapper le groupe LDAP `cn=admin,ou=groups,dc=projet,dc=lan` vers le rôle Zammad `Admin`.
+   - Vous pouvez mapper le groupe LDAP `cn=admin,ou=groups,dc=ticketing,dc=lan` vers le rôle Zammad `Admin`.
    - Vous pouvez mapper `cn=techN1...` vers `Agent`.
 7. Cliquez sur **Continuer** puis lancez la synchronisation.
 
@@ -78,14 +78,14 @@ Pour que Zammad envoie des notifications :
    - **Utilisateur** : (Laisser vide)
    - **Mot de passe** : (Laisser vide)
 3. Zammad enverra désormais les notifications via MailHog.
-4. Vous pouvez voir les emails envoyés sur **http://mail.ticketing.lan**.
+4. Vous pouvez voir les emails envoyés sur **http://localhost:8085**.
 
 ---
 
 ## 3. Uptime Kuma (Monitoring)
 
 ### A. Création de compte
-1. Accédez à **http://monitor.ticketing.lan**.
+1. Accédez à **http://localhost:8083**.
 2. Créez votre compte administrateur local (ex: `admin` / `password`).
 
 ### B. Ajouter des Sondes (Monitors)
@@ -116,6 +116,6 @@ Comme Uptime Kuma est dans le même réseau Docker (`it_stack_net`), il peut con
 
 ## 4. Dozzle (Logs)
 
-1. Accédez à **http://logs.ticketing.lan**.
+1. Accédez à **http://localhost:8084**.
 2. Aucune configuration n'est nécessaire.
 3. Cliquez sur un conteneur à gauche (ex: `zammad-app`) pour voir ses logs en temps réel.
