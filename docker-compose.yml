@@ -123,7 +123,7 @@ services:
       - MYSQL_DATABASE=${MYSQL_DATABASE}
       - MYSQL_USER=${MYSQL_USER}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-      - APP_URL=http://snipeit.${DOMAIN}
+      - APP_URL=http://localhost:8081
       - APP_KEY=${SNIPEIT_APP_KEY}
       - LDAP_ROOT_PASSWORD=${LDAP_ROOT_PASSWORD}
       - MAIL_DRIVER=smtp
