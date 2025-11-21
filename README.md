@@ -103,9 +103,9 @@ make setup
 
 | Service | URL | Credentials / Status |
 | :--- | :--- | :--- |
-| **Zammad** | `http://zammad.lvh.me` | **Login:** `admin@ticketing.lan` <br> **Pass:** `admin123` |
+| **Zammad** | `http://zammad.lvh.me` | **Login:** `admin@ticketing.local` <br> **Pass:** `admin123` |
 | **Snipe-IT** | `http://snipeit.lvh.me` | **Status:** Complete Wizard <br> **DB:** `snipeit` / `snipeit` / `snipeit_password` |
-| **phpLDAPadmin** | `http://ldap.lvh.me` | **Login:** `cn=admin,dc=ticketing,dc=lan` <br> **Pass:** (See `.env`) |
+| **phpLDAPadmin** | `http://ldap.lvh.me` | **Login:** `cn=admin,dc=ticketing,dc=local` <br> **Pass:** (See `.env`) |
 | **Uptime Kuma** | `http://uptime.lvh.me` | **Status:** Create admin account |
 | **Dozzle** | `http://dozzle.lvh.me` | **Status:** Free access |
 | **MailHog** | `http://mailhog.lvh.me` | **Status:** Free access |
@@ -169,7 +169,7 @@ docker compose down -v               # Remove everything
 
 ## 🔧 Customization
 **Environment Variables (.env):**
-*   `DOMAIN=ticketing.lan`: Base domain.
+*   `DOMAIN=ticketing.local`: Base domain.
 *   `LDAP_ROOT_PASSWORD`: Password for `cn=admin`.
 *   `POSTGRES_PASSWORD` / `MYSQL_PASSWORD`: DB passwords.
 

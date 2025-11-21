@@ -1,84 +1,84 @@
-# Guide de Configuration Manuelle
+# 📘 Guide de Configuration Post-Déploiement
 
-Ce guide détaille les étapes pas-à-pas pour configurer les services après le déploiement de la stack via `make setup`.
+Ce guide détaille les étapes manuelles nécessaires une fois la stack Docker lancée (`make setup`).
+
+**Informations de base :**
+*   **Domaine local :** `*.lvh.me` (pointe vers 127.0.0.1)
+*   **Mot de passe Admin par défaut :** `admin123`
+*   **Mot de passe LDAP racine :** `YourStrongLdapPassword` (ou voir `.env`)
 
 ---
 
 ## 1. Snipe-IT (Gestion de Parc)
 
-### A. Assistant d'Installation (Premier accès)
+### A. Assistant d'Installation
 1. Accédez à **http://snipeit.lvh.me/setup**.
-2. **Pre-Flight Check** : Tous les indicateurs devraient être verts. Cliquez sur **Next: Create Database Tables**.
+2. **Pre-Flight Check** : Tout doit être vert. Cliquez sur **Next: Create Database Tables**.
 3. **Create User** :
    - **Site Name** : `Ticketing LAN`
    - **Default Currency** : `EUR`
-   - **Admin User** : Créez votre compte administrateur local (ce sera le "Super Admin").
+   - **Admin User** : Créez un administrateur local de secours.
 4. Une fois terminé, connectez-vous avec ce compte.
 
 ### B. Configuration LDAP
-Pour permettre aux utilisateurs (Techs, Clients) de se connecter :
-
-1. Allez dans **Settings (roue dentée en haut à droite) > LDAP**.
-2. Remplissez les champs suivants :
+1. Allez dans **Settings (roue dentée) > LDAP**.
+2. Remplissez ainsi :
    - **LDAP Integration** : `Enabled`
-   - **LDAP Password Sync** : `Yes` (Permet aux utilisateurs de se loguer avec leur mdp LDAP)
-   - **Active Directory** : `No` (Nous utilisons OpenLDAP)
-   - **LDAP Server** : `ldap://openldap`
+   - **LDAP Password Sync** : `Yes`
+   - **Active Directory** : `No`
+   - **LDAP Server** : `ldap://openldap` (Protocole standard interne)
    - **Use TLS** : `No`
-   - **LDAP Bind Username** : `cn=admin,dc=ticketing,dc=lan`
-   - **LDAP Bind Password** : `YourStrongLdapPassword` (ou voir variable `LDAP_ROOT_PASSWORD` dans `.env`)
-   - **Base Bind DN** : `dc=ticketing,dc=lan`
+   - **LDAP Bind Username** : `cn=admin,dc=ticketing,dc=local`
+   - **LDAP Bind Password** : `YourStrongLdapPassword`
+   - **Base Bind DN** : `dc=ticketing,dc=local`
    - **LDAP Filter** : `&(objectClass=inetOrgPerson)`
    - **Username Field** : `uid`
    - **Last Name** : `sn`
    - **First Name** : `givenName`
    - **Email** : `mail`
-3. Cliquez sur **Save**.
-4. Testez la connexion avec le bouton **Test LDAP Connection** (Doit afficher "It worked!").
-5. Pour importer les utilisateurs immédiatement :
-   - Allez dans **People** (menu gauche).
-   - Cliquez sur le bouton **LDAP Sync**.
-   - Cliquez sur **Synchronize**.
+3. Cliquez sur **Save** puis **Test LDAP Connection** (Doit afficher "It worked!").
+4. Allez dans **People > LDAP Sync > Synchronize** pour importer les utilisateurs.
 
 ---
 
 ## 2. Zammad (Ticketing)
 
-### A. Connexion Initiale
+### A. Connexion et Organisation
 1. Accédez à **http://zammad.lvh.me**.
-2. Connectez-vous avec le compte administrateur pré-créé par le script :
-   - **Email** : `admin@ticketing.lan`
+2. Connectez-vous :
+   - **Email** : `admin@ticketing.local`
    - **Mot de passe** : `admin123`
+3. **Assistant de configuration** :
+   - À l'étape "Organisation", nommez-la **Ticketing**.
+   - Si vous avez déjà passé cette étape : Allez dans *Gestion > Organisations > Projet LAN*, renommez-le et sauvegardez.
 
-### B. Intégration LDAP
-1. Allez dans **Système (icône engrenage en bas à gauche) > Intégrations > LDAP**.
-2. Cliquez sur **Configurer**.
-3. **Serveur** :
+### B. Intégration LDAP (Configuration Correcte)
+1. Allez dans **Système (engrenage) > Intégrations > LDAP > Configurer**.
+2. **Étape 1 : Serveur**
    - **Hôte** : `openldap`
-   - **Utilisateur** : `cn=admin,dc=ticketing,dc=lan`
+   - **SSL/STARTTLS** : `Non` (Important !)
+   - **Vérification SSL** : `Non`
+   - **Actif** : `Oui`
+   - Cliquez sur **Connecter**.
+3. **Étape 2 : Authentification**
+   - **Utilisateur** : `cn=admin,dc=ticketing,dc=local`
    - **Mot de passe** : `YourStrongLdapPassword`
-4. Cliquez sur **Continuer**. Zammad va détecter automatiquement la Base DN (`dc=ticketing,dc=lan`).
-5. **Mappage des Attributs** :
-   - Vérifiez que **Login** est mappé sur `uid`.
-   - Vérifiez que **Prénom** est mappé sur `givenName`.
-   - Vérifiez que **Nom** est mappé sur `sn`.
-   - Vérifiez que **Email** est mappé sur `mail`.
-6. **Mappage des Rôles** (Optionnel mais recommandé) :
-   - Vous pouvez mapper le groupe LDAP `cn=admin,ou=groups,dc=ticketing,dc=lan` vers le rôle Zammad `Admin`.
-   - Vous pouvez mapper `cn=techN1...` vers `Agent`.
-7. Cliquez sur **Continuer** puis lancez la synchronisation.
+   - Cliquez sur **Continuer** (La Base DN `dc=ticketing,dc=local` doit être détectée).
+4. **Étape 3 : Mappage (Cartographie)**
+   - **Login** : Remplacez `samaccountname` par **`uid`**.
+   - **Prénom/Nom/Email** : Laissez par défaut (`givenname`, `sn`, `mail`).
+   - **Rôles** :
+     - Ajoutez une règle : Groupe LDAP `cn=techs...` ⮕ Rôle Zammad `Agent`.
+   - **Expert (Filtre)** :
+     - Remplacez `(objectClass=posixaccount)` par **`(objectClass=inetOrgPerson)`**.
+     - Option "Utilisateurs sans groupes..." : Mettre sur **Attribuer des rôles d'inscription** (pour créer les clients).
+5. Lancez la synchronisation.
 
 ### C. Configuration Email (SMTP sortant)
-Pour que Zammad envoie des notifications :
-
 1. Allez dans **Système > Canaux > Email > Comptes**.
-2. Configurez le serveur sortant (SMTP) :
+2. Configurez le SMTP sortant :
    - **Hôte** : `mailhog`
    - **Port** : `1025`
-   - **Utilisateur** : (Laisser vide)
-   - **Mot de passe** : (Laisser vide)
-3. Zammad enverra désormais les notifications via MailHog.
-4. Vous pouvez voir les emails envoyés sur **http://mailhog.lvh.me**.
 
 ---
 
@@ -86,36 +86,36 @@ Pour que Zammad envoie des notifications :
 
 ### A. Création de compte
 1. Accédez à **http://uptime.lvh.me**.
-2. Créez votre compte administrateur local (ex: `admin` / `password`).
+2. Créez votre compte administrateur local (ex: `admin` / `admin123`).
 
-### B. Ajouter des Sondes (Monitors)
-Comme Uptime Kuma est dans le même réseau Docker (`it_stack_net`), il peut contacter les autres conteneurs directement par leur nom.
+### B. Ajouter des Sondes (Réseau Interne Docker)
+Nous utilisons les noms de conteneurs internes pour une fiabilité maximale.
 
-**1. Monitorer Zammad :**
-- Cliquez sur **Add New Monitor**.
-- **Monitor Type** : `HTTP(s)`
-- **Friendly Name** : `Zammad Internal`
-- **URL** : `http://zammad-nginx:8080` (On tape sur le port interne du conteneur Nginx de Zammad)
-- **Heartbeat Interval** : `60` (secondes)
-- Cliquez sur **Save**.
+**1. Monitorer Zammad**
+- **Type** : `HTTP(s)`
+- **Nom** : `Zammad Internal`
+- **URL** : `http://zammad-nginx:8080`
+  - *Note : On tape sur le serveur Nginx dédié à Zammad.*
+- **Sauvegarder**.
 
-**2. Monitorer Snipe-IT :**
-- **Monitor Type** : `HTTP(s)`
-- **Friendly Name** : `Snipe-IT Internal`
-- **URL** : `http://snipe-it:80`
-- Cliquez sur **Save**.
+**2. Monitorer Snipe-IT (Configuration Spéciale)**
+- **Type** : `HTTP(s)`
+- **Nom** : `Snipe-IT Internal`
+- **URL** : `http://nginx`
+  - *Note : Le conteneur nommé "nginx" est le serveur web frontal de Snipe-IT.*
+- **Avancé > Mots-clés** :
+  - Ajoutez le mot : `Snipe-IT` (ou `Login`).
+  - *Cela garantit que c'est bien l'application qui répond et pas juste une page blanche Nginx.*
+- **Sauvegarder**.
 
-**3. Monitorer l'Annuaire LDAP :**
-- **Monitor Type** : `TCP Port`
-- **Friendly Name** : `OpenLDAP`
+**3. Monitorer l'Annuaire LDAP**
+- **Type** : `Port TCP`
+- **Nom** : `OpenLDAP`
 - **Hostname** : `openldap`
 - **Port** : `389`
-- Cliquez sur **Save**.
+- **Sauvegarder**.
 
 ---
 
 ## 4. Dozzle (Logs)
-
-1. Accédez à **http://dozzle.lvh.me**.
-2. Aucune configuration n'est nécessaire.
-3. Cliquez sur un conteneur à gauche (ex: `zammad-app`) pour voir ses logs en temps réel.
+- Accédez à **http://dozzle.lvh.me** pour visualiser les logs de tous les conteneurs en temps réel (utile pour le débogage).

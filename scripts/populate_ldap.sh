@@ -4,7 +4,7 @@
 # Facilement configurable via les variables GROUPS et USERS
 
 # Variables (modifiez ici pour ajouter/supprimer)
-DOMAIN="ticketing.lan"
+DOMAIN="ticketing.local"
 BASE_DN="dc=ticketing,dc=lan"
 LDAP_ADMIN_DN="cn=admin,$BASE_DN"
 LDAP_PASSWORD="${LDAP_ROOT_PASSWORD:-YourStrongLdapPassword}"  # Utilise la variable env ou le mot de passe du .env
@@ -16,10 +16,10 @@ LDAP_GROUPS=("N1" "N2" "N3" "Users")
 # Utilisateurs par groupe (format: uid:prenom:nom:email:uidNumber)
 # Modifiez cette liste pour ajouter/supprimer des utilisateurs
 declare -A USERS
-USERS[N3]="bob.ladmin:Bob:Ladmin:bob.ladmin@ticketing.lan:10001"
-USERS[N2]="robert.lemodo:Robert:Lemodo:robert.lemodo@ticketing.lan:10002"
-USERS[N1]="chris.letech:Chris:Letech:chris.letech@ticketing.lan:10003"
-USERS[Users]="jean.user:Jean:User:jean.user@ticketing.lan:10004"
+USERS[N3]="bob.ladmin:Bob:Ladmin:bob.ladmin@ticketing.local:10001"
+USERS[N2]="robert.lemodo:Robert:Lemodo:robert.lemodo@ticketing.local:10002"
+USERS[N1]="chris.letech:Chris:Letech:chris.letech@ticketing.local:10003"
+USERS[Users]="jean.user:Jean:User:jean.user@ticketing.local:10004"
 
 # Hash du mot de passe "password" (généré avec slappasswd -s password)
 PASSWORD_HASH="{SSHA}uWB7hQ3htBe4AGfQpOPcD7e1GeWwP5dt"
