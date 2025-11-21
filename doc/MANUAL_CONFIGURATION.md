@@ -55,9 +55,9 @@ Pour permettre aux utilisateurs (Techs, Clients) de se connecter :
 2. Cliquez sur **Configurer**.
 3. **Serveur** :
    - **Hôte** : `openldap`
-   - **Utilisateur** : `cn=admin,dc=projet,dc=lan`
+   - **Utilisateur** : `cn=admin,dc=ticketing,dc=lan`
    - **Mot de passe** : `YourStrongLdapPassword`
-4. Cliquez sur **Continuer**. Zammad va détecter automatiquement la Base DN (`dc=projet,dc=lan`).
+4. Cliquez sur **Continuer**. Zammad va détecter automatiquement la Base DN (`dc=ticketing,dc=lan`).
 5. **Mappage des Attributs** :
    - Vérifiez que **Login** est mappé sur `uid`.
    - Vérifiez que **Prénom** est mappé sur `givenName`.
