@@ -19,11 +19,13 @@ sleep 5
 puts "Vérification si le système est déjà initialisé..."
 
 # Toujours s'assurer que l'organisation et l'admin existent, même si init_done est true
-puts "Vérification/Création de l'organisation 'Projet LAN'..."
+puts "Vérification/Création de l'organisation 'Ticketing local'..."
 # Définir l'utilisateur système pour les actions de création
 UserInfo.current_user_id = 1
 
-org = Organization.find_or_create_by(name: 'Projet LAN')
+org = Organization.find_or_create_by(name: 'Ticketing local')
+# Forcer la mise à jour du nom si l'organisation existe déjà avec un autre nom
+org.update!(name: 'Ticketing local')
 
 puts "Vérification/Création de l'utilisateur Admin..."
 admin_role = Role.find_by(name: 'Admin')
