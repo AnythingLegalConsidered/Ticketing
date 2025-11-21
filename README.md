@@ -1,14 +1,10 @@
 # Containerized Ticketing Infrastructure
 **Status:** Operational
 
-<div align="center">
-  <select id="language-selector" onchange="switchLanguage()">
-    <option value="en">🇺🇸 English</option>
-    <option value="fr">🇫🇷 Français</option>
-  </select>
-</div>
+## 🌐 Language / Langue
 
-<div id="english-content">
+<details>
+<summary>🇺🇸 English</summary>
 
 ## 🎯 Project Objective
 This project deploys a complete containerized IT infrastructure for ticket and IT inventory management. It uses **Docker Compose** to orchestrate multiple interconnected open-source services.
@@ -198,9 +194,10 @@ You can add users in `openldap/add-entries.ldif` before building, or simply use 
 ## 📄 License
 This project is under MIT license - see the LICENSE file for details.
 
-</div>
+</details>
 
-<div id="french-content" style="display: none;">
+<details>
+<summary>🇫🇷 Français</summary>
 
 ## 🎯 Objectif du Projet
 Ce projet déploie une infrastructure IT complète conteneurisée pour la gestion des tickets et de l'inventaire IT. Il utilise **Docker Compose** pour orchestrer plusieurs services open-source interconnectés.
@@ -390,42 +387,4 @@ Vous pouvez ajouter des utilisateurs dans `openldap/add-entries.ldif` avant le b
 ## 📄 Licence
 Ce projet est sous licence MIT - voir le fichier LICENSE pour plus de détails.
 
-</div>
-
-<script>
-function switchLanguage() {
-  const selector = document.getElementById('language-selector');
-  const englishContent = document.getElementById('english-content');
-  const frenchContent = document.getElementById('french-content');
-  
-  if (selector.value === 'fr') {
-    englishContent.style.display = 'none';
-    frenchContent.style.display = 'block';
-  } else {
-    englishContent.style.display = 'block';
-    frenchContent.style.display = 'none';
-  }
-}
-</script>
-
-<style>
-#language-selector {
-  padding: 8px 12px;
-  font-size: 16px;
-  border: 2px solid #ddd;
-  border-radius: 6px;
-  background-color: white;
-  cursor: pointer;
-  margin-bottom: 20px;
-}
-
-#language-selector:hover {
-  border-color: #007acc;
-}
-
-#language-selector:focus {
-  outline: none;
-  border-color: #007acc;
-  box-shadow: 0 0 0 2px rgba(0, 122, 204, 0.2);
-}
-</style>
+</details>
