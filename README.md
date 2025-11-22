@@ -1,6 +1,8 @@
 # Containerized Ticketing Infrastructure
 **Status:** Operational
 
+🇫🇷 [Lire en français](README.fr.md)
+
 ## 🎯 Project Objective
 This project deploys a complete containerized IT infrastructure for ticket and IT inventory management. It uses **Docker Compose** to orchestrate multiple interconnected open-source services.
 
